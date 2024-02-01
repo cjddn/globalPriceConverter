@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>엔화 계산기</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .section-01 {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .section-02 {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        button {
+            background-color: #fff;
+            color: #007BFF;
+            border: 1px solid #007BFF;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        select,
+        input {
+            padding: 5px;
+            margin-right: 10px;
+        }
+
+        div {
+            margin: 20px 0;
+        }
+
+        label {
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        #result {
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="section-01">
+        <h1>엔화 계산기</h1>
+
+        <select id="from">
+            <option value="krw">원</option>
+            <option value="jpy">엔</option>
+        </select>에서
+        <span id="to">엔</span><span>으로</span>
+        <button id="submit">변환하기</button>
+        <button id="reset">초기화</button>
+    </section>
+
+    <section class="section-02">
+        <label for="price">가격<input id="price" type="text"> </label>에서
+        <label for="percent"><input id="percent" type="text">%더하기</label>
+        <div>결과: <span id="result"></span></div>
+    </section>
+
+    <script>
+        const from = document.getElementById("from")
+        const to = document.getElementById("to")
+        const submit = document.getElementById("submit")
+        const price = document.getElementById("price")
+        const percent = document.getElementById("percent")
+        const result = document.getElementById("result")
+        const reset = document.getElementById("reset")
+        reset.addEventListener("click", async () => {
+            price.value = ""
+            percent.value = ""
+            result.innerText = ""
+        })
+        from.addEventListener("change", async () => {
+            to.innerText = from.value === "krw" ? "엔" : "원"
+        })
+        submit.addEventListener("click", async () => {
+            const response = await fetch(
+                "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/jpy/krw.min.json"
+            )
+            const responseData = await response.json();
+            let resultPrice = 0;
+            if (from.value === "krw")
+                resultPrice = price.value / responseData.krw;
+            else
+                resultPrice = price.value * responseData.krw;
+
+            if (percent.value) {
+                resultPrice = resultPrice + (resultPrice * (percent.value / 100))
+            }
+            result.innerText = `${resultPrice} ${to.innerText}`
+        })
+    </script>
+</body>
+
+</html>
